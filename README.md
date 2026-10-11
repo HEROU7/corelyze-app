@@ -19,6 +19,16 @@
 
 ---
 
+## 💾 Descarga Oficial para Windows
+
+[![Descargar Corelyze para Windows](https://img.shields.io/badge/Descargar-Corelyze%20v1.0.0%20(.exe)-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/HEROU7/corelyze-app/releases/download/v1.0.0/Corelyze_1.0.0_x64-setup.exe)
+
+- 📥 **Instalador Recomendado (.exe):** [Corelyze_1.0.0_x64-setup.exe](https://github.com/HEROU7/corelyze-app/releases/download/v1.0.0/Corelyze_1.0.0_x64-setup.exe) *(2.44 MiB)*
+- 📦 **Instalador Corporativo (.msi):** [Corelyze_1.0.0_x64_en-US.msi](https://github.com/HEROU7/corelyze-app/releases/download/v1.0.0/Corelyze_1.0.0_x64_en-US.msi) *(3.54 MiB)*
+- 🏷️ **Página Oficial de la Release:** [Releases / v1.0.0](https://github.com/HEROU7/corelyze-app/releases/tag/v1.0.0)
+
+---
+
 ## 🚀 Visión General
 
 **Corelyze** es una suite de escritorio diseñada con arquitectura *offline-first* para entusiastas, técnicos y ensambladores de PC. Permite auditar el hardware instalado en tiempo real, validar compatibilidad técnica de componentes, estimar consumo energético (PSU), proyectar tasas de cuadros por segundo (FPS) en más de 50 títulos de juegos y comparar componentes mano a mano sin depender de servicios en la nube.
