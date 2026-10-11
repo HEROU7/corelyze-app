@@ -23,8 +23,8 @@
 
 [![Descargar Corelyze para Windows](https://img.shields.io/badge/Descargar-Corelyze%20v1.0.0%20(.exe)-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/HEROU7/corelyze-app/releases/download/v1.0.0/Corelyze_1.0.0_x64-setup.exe)
 
-- 📥 **Instalador Recomendado (.exe):** [Corelyze_1.0.0_x64-setup.exe](https://github.com/HEROU7/corelyze-app/releases/download/v1.0.0/Corelyze_1.0.0_x64-setup.exe) *(2.44 MiB)*
-- 📦 **Instalador Corporativo (.msi):** [Corelyze_1.0.0_x64_en-US.msi](https://github.com/HEROU7/corelyze-app/releases/download/v1.0.0/Corelyze_1.0.0_x64_en-US.msi) *(3.54 MiB)*
+- 📥 **Instalador Recomendado (.exe):** [Corelyze_1.0.0_x64-setup.exe](https://github.com/HEROU7/corelyze-app/releases/download/v1.0.0/Corelyze_1.0.0_x64-setup.exe) *(38.30 MiB - Backend NestJS y motor offline integrados)*
+- 📦 **Instalador Corporativo (.msi):** [Corelyze_1.0.0_x64_en-US.msi](https://github.com/HEROU7/corelyze-app/releases/download/v1.0.0/Corelyze_1.0.0_x64_en-US.msi) *(57.09 MiB - Paquete MSI enterprise)*
 - 🏷️ **Página Oficial de la Release:** [Releases / v1.0.0](https://github.com/HEROU7/corelyze-app/releases/tag/v1.0.0)
 
 ---

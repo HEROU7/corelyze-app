@@ -4,7 +4,8 @@
   "private": true,
   "description": "Agente de escritorio Tauri para Corelyze",
   "scripts": {
-    "build": "npm --prefix ../frontend run build",
+    "prepare:sidecar": "node scripts/prepare-sidecar.js",
+    "build": "npm --prefix ../frontend run build && node scripts/prepare-sidecar.js",
     "dev": "npm --prefix ../frontend run dev"
   }
 }

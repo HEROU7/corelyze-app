@@ -35,21 +35,33 @@ export default function DashboardPage() {
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([
-      hardwareService.getComponents(),
-      hardwareService.getCategories(),
-      hardwareService.getMarcas(),
-    ])
-      .then(([componentes, categorias, marcas]) => {
-        if (cancelled) return
-        setStats({ componentes: componentes.length, categorias: categorias.length, marcas: marcas.length })
-        setLoading(false)
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return
-        setError(err instanceof Error ? err.message : "No se pudo conectar con la API")
-        setLoading(false)
-      })
+    let attempt = 0
+    const maxAttempts = 3
+
+    const loadData = () => {
+      Promise.all([
+        hardwareService.getComponents(),
+        hardwareService.getCategories(),
+        hardwareService.getMarcas(),
+      ])
+        .then(([componentes, categorias, marcas]) => {
+          if (cancelled) return
+          setStats({ componentes: componentes.length, categorias: categorias.length, marcas: marcas.length })
+          setLoading(false)
+        })
+        .catch((err: unknown) => {
+          if (cancelled) return
+          attempt++
+          if (attempt < maxAttempts) {
+            setTimeout(loadData, 1000)
+          } else {
+            setError(err instanceof Error ? err.message : "No se pudo conectar con la API")
+            setLoading(false)
+          }
+        })
+    }
+
+    loadData()
     return () => {
       cancelled = true
     }

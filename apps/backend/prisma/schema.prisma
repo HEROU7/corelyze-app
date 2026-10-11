@@ -15,7 +15,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:../data/corelyze.sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model Marca {

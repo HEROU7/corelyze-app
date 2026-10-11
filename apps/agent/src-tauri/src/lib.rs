@@ -573,9 +573,20 @@ fn scan_hardware() -> HardwareInfo {
     scan_hardware_impl()
 }
 
+use std::sync::Mutex;
+use tauri::Manager;
+use tauri_plugin_shell::process::CommandChild;
+use tauri_plugin_shell::ShellExt;
+
+pub struct BackendState {
+    pub child: Option<CommandChild>,
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
+    .plugin(tauri_plugin_shell::init())
+    .manage(Mutex::new(BackendState { child: None }))
     .invoke_handler(tauri::generate_handler![scan_hardware])
     .setup(|app| {
       if cfg!(debug_assertions) {
@@ -585,7 +596,41 @@ pub fn run() {
             .build(),
         )?;
       }
+
+      // Inicia automáticamente el sidecar del backend de Corelyze
+      let parent_pid = std::process::id().to_string();
+      match app.shell().sidecar("corelyze-backend") {
+        Ok(cmd) => {
+          let configured_cmd = cmd.env("CORELYZE_PARENT_PID", &parent_pid);
+          match configured_cmd.spawn() {
+            Ok((_rx, child)) => {
+              log::info!("Backend sidecar de Corelyze iniciado con éxito");
+              let state = app.state::<Mutex<BackendState>>();
+              if let Ok(mut lock) = state.lock() {
+                lock.child = Some(child);
+              }
+            }
+            Err(e) => {
+              log::error!("No se pudo inicializar el backend sidecar: {}", e);
+            }
+          }
+        }
+        Err(e) => {
+          log::warn!("Sidecar del backend no disponible: {}", e);
+        }
+      }
+
       Ok(())
+    })
+    .on_window_event(|window, event| {
+      if let tauri::WindowEvent::Destroyed = event {
+        let state = window.state::<Mutex<BackendState>>();
+        if let Ok(mut lock) = state.lock() {
+          if let Some(child) = lock.child.take() {
+            let _ = child.kill();
+          }
+        }
+      }
     })
     .run(tauri::generate_context!())
     .expect("error while building tauri application");
