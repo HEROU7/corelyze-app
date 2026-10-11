@@ -1,0 +1,138 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+//
+// Corelyze es 100% portátil: usa SQLite local (sin servidores externos).
+// El archivo vive en apps/backend/data/corelyze.sqlite y las tablas se
+// sincronizan automáticamente con `prisma db push` (ver scripts/prepare-db.js).
+//
+// Nota: el conector SQLite no soporta enums, listas escalares ni el tipo Json.
+// Por eso los enums se guardan como String y los JSON/listas como texto
+// serializado (los repositorios los serializan/deserializan de forma transparente).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../data/corelyze.sqlite"
+}
+
+model Marca {
+  id          String      @id @default(uuid())
+  nombre      String      @unique
+  slug        String      @unique
+  logoUrl     String?
+  colorHex    String?
+  website     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  componentes Componente[]
+}
+
+model Categoria {
+  id          String            @id @default(uuid())
+  nombre      String            @unique
+  slug        String            @unique
+  descripcion String?
+  icono       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  componentes Componente[]
+}
+
+model Componente {
+  id                  String              @id @default(uuid())
+  nombre              String
+  slug                String              @unique
+  sku                 String              @unique
+  descripcion         String?
+  marcaId             String
+  categoriaId         String
+  precio              Decimal?
+  stock               Int                 @default(0)
+  activo              Boolean             @default(true)
+  imagenUrl           String              @default("[]")
+  especificaciones    String?
+  datosTecnicos       String?
+  metadata            String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  marca               Marca               @relation(fields: [marcaId], references: [id])
+  categoria           Categoria           @relation(fields: [categoriaId], references: [id])
+  ensamblajes         EnsambleComponente[]
+  incompatibilidades  Incompatibilidad[]  @relation("ComponenteOrigen")
+  incompatibilidades2 Incompatibilidad[]  @relation("ComponenteDestino")
+}
+
+model EnsamblePreconfigurado {
+  id                String              @id @default(uuid())
+  nombre            String
+  slug              String              @unique
+  descripcion       String?
+  categoria         String              @default("CUSTOM")
+  casoUso           String              @default("[]")
+  puntuacionGlobal  Decimal?
+  precioTotal       Decimal?
+  pros              String              @default("[]")
+  contras           String              @default("[]")
+  imagenUrl         String?
+  especificaciones  String?
+  rendimiento       String?
+  configuracion     String?
+  activo            Boolean             @default(true)
+  destacado         Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  componentes       EnsambleComponente[]
+}
+
+model EnsambleComponente {
+  id                    String                @id @default(uuid())
+  ensamblajeId          String
+  componenteId          String
+  cantidad              Int                   @default(1)
+  posicion              String?
+  obligatorio           Boolean               @default(true)
+  notas                 String?
+  ensamblaje            EnsamblePreconfigurado @relation(fields: [ensamblajeId], references: [id], onDelete: Cascade)
+  componente            Componente             @relation(fields: [componenteId], references: [id])
+  @@unique([ensamblajeId, componenteId])
+}
+
+model Incompatibilidad {
+  id              String      @id @default(uuid())
+  tipo            String
+  descripcion     String
+  severidad       String      @default("MEDIA")
+  componenteId1   String
+  componenteId2   String?
+  regla           String?
+  activo          Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  componente1     Componente  @relation("ComponenteOrigen", fields: [componenteId1], references: [id])
+  componente2     Componente? @relation("ComponenteDestino", fields: [componenteId2], references: [id])
+}
+
+model ReglaValidacion {
+  id          String   @id @default(uuid())
+  nombre      String
+  tipo        String
+  descripcion String?
+  condicion   String
+  accion      String
+  prioridad   Int      @default(0)
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ConfiguracionSistema {
+  id          String   @id @default(uuid())
+  clave       String   @unique
+  valor       String
+  descripcion String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

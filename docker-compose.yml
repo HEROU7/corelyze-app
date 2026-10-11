@@ -1,0 +1,7 @@
+# Corelyze v1.0 es 100% portátil y ya NO requiere servicios externos:
+#   - Persistencia: SQLite local en apps/backend/data/corelyze.sqlite
+#   - Caché: módulo en memoria de NestJS (@nestjs/cache-manager)
+#
+# Este archivo se conserva solo por compatibilidad histórica. No define
+# ningún servicio; puedes eliminarlo sin afectar a la aplicación.
+services: {}
