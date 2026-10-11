@@ -573,10 +573,67 @@ fn scan_hardware() -> HardwareInfo {
     scan_hardware_impl()
 }
 
+use std::net::TcpListener;
+use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::Manager;
 use tauri_plugin_shell::process::CommandChild;
 use tauri_plugin_shell::ShellExt;
+
+fn is_port_bindable(port: u16) -> bool {
+    TcpListener::bind(("127.0.0.1", port)).is_ok()
+}
+
+fn find_available_port(preferred: u16) -> u16 {
+    if is_port_bindable(preferred) {
+        return preferred;
+    }
+    for p in (preferred + 1)..=(preferred + 100) {
+        if is_port_bindable(p) {
+            return p;
+        }
+    }
+    if let Ok(listener) = TcpListener::bind(("127.0.0.1", 0)) {
+        if let Ok(addr) = listener.local_addr() {
+            return addr.port();
+        }
+    }
+    preferred
+}
+
+fn get_corelyze_dir() -> PathBuf {
+    let app_data = std::env::var("APPDATA")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| PathBuf::from("."));
+    app_data.join("Corelyze")
+}
+
+fn save_backend_port(port: u16) {
+    let dir = get_corelyze_dir();
+    let _ = std::fs::create_dir_all(&dir);
+    let _ = std::fs::write(dir.join("port.txt"), port.to_string());
+}
+
+fn read_backend_port() -> u16 {
+    let port_file = get_corelyze_dir().join("port.txt");
+    if let Ok(content) = std::fs::read_to_string(port_file) {
+        if let Ok(port) = content.trim().parse::<u16>() {
+            return port;
+        }
+    }
+    49152
+}
+
+#[tauri::command]
+fn get_backend_port() -> u16 {
+    read_backend_port()
+}
+
+#[tauri::command]
+fn get_backend_url() -> String {
+    let port = read_backend_port();
+    format!("http://127.0.0.1:{}/api", port)
+}
 
 pub struct BackendState {
     pub child: Option<CommandChild>,
@@ -587,7 +644,7 @@ pub fn run() {
   tauri::Builder::default()
     .plugin(tauri_plugin_shell::init())
     .manage(Mutex::new(BackendState { child: None }))
-    .invoke_handler(tauri::generate_handler![scan_hardware])
+    .invoke_handler(tauri::generate_handler![scan_hardware, get_backend_port, get_backend_url])
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
@@ -597,14 +654,20 @@ pub fn run() {
         )?;
       }
 
-      // Inicia automáticamente el sidecar del backend de Corelyze
+      // Inicia automáticamente el sidecar del backend de Corelyze con puerto dinámico
       let parent_pid = std::process::id().to_string();
+      let port = find_available_port(49152);
+      save_backend_port(port);
+
       match app.shell().sidecar("corelyze-backend") {
         Ok(cmd) => {
-          let configured_cmd = cmd.env("CORELYZE_PARENT_PID", &parent_pid);
+          let configured_cmd = cmd
+            .env("CORELYZE_PARENT_PID", &parent_pid)
+            .env("BACKEND_PORT", port.to_string())
+            .env("PORT", port.to_string());
           match configured_cmd.spawn() {
             Ok((_rx, child)) => {
-              log::info!("Backend sidecar de Corelyze iniciado con éxito");
+              log::info!("Backend sidecar de Corelyze iniciado en puerto {}", port);
               let state = app.state::<Mutex<BackendState>>();
               if let Ok(mut lock) = state.lock() {
                 lock.child = Some(child);

@@ -266,7 +266,7 @@ export default function BuildsPage() {
       {loading && (
         <div className="flex items-center gap-2 rounded-lg border bg-muted/20 p-4 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Cargando builds desde http://localhost:3000/api/builds…
+          Cargando builds desde el motor local de Corelyze…
         </div>
       )}
 

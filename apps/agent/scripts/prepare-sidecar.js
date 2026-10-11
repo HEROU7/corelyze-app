@@ -78,6 +78,26 @@ const nodeDest = path.join(resourcesDir, 'node.exe');
 fs.copyFileSync(nodeSource, nodeDest);
 console.log(`   Node runtime copiado: ${nodeSource} -> ${nodeDest}`);
 
+// Copiar DLLs de Microsoft Visual C++ Runtime si existen en el sistema (evita error 126 en PCs limpias)
+const vcDlls = ['msvcp140.dll', 'vcruntime140.dll', 'vcruntime140_1.dll'];
+const system32 = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32');
+const prismaClientDir = path.join(resNodeModules, '.prisma/client');
+for (const dll of vcDlls) {
+  const sysDll = path.join(system32, dll);
+  if (fs.existsSync(sysDll)) {
+    try {
+      fs.copyFileSync(sysDll, path.join(resourcesDir, dll));
+      fs.copyFileSync(sysDll, path.join(backendResourceDir, dll));
+      if (fs.existsSync(prismaClientDir)) {
+        fs.copyFileSync(sysDll, path.join(prismaClientDir, dll));
+      }
+      console.log(`   DLL de soporte C++ copiada: ${dll}`);
+    } catch (e) {
+      console.warn(`   Aviso al copiar ${dll}:`, e.message);
+    }
+  }
+}
+
 // 6. Compilar el launcher binario en Rust directamente con rustc
 console.log('🦀 5/6 Compilando launcher sidecar en Rust (corelyze-backend)...');
 const launcherSource = path.join(tauriDir, 'src/backend_launcher.rs');

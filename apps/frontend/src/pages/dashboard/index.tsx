@@ -179,7 +179,7 @@ export default function DashboardPage() {
       {error && (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
           <p className="text-sm text-destructive">
-            No se pudo conectar con la API en http://localhost:3000/api: {error}
+            No se pudo conectar con el motor local de Corelyze: {error}
           </p>
           <Button size="sm" variant="outline" onClick={retry}>
             <RotateCcw className="h-4 w-4" />

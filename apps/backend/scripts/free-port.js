@@ -6,7 +6,7 @@
 const net = require('node:net');
 const { execSync } = require('node:child_process');
 
-const PORT = Number(process.env.BACKEND_PORT || process.env.PORT || 3000);
+const PORT = Number(process.env.BACKEND_PORT || process.env.PORT || 49152);
 
 function isPortInUse(port) {
   return new Promise((resolve) => {

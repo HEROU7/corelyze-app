@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from "react"
 import { cn } from "@/lib/utils"
-import { Loader2, CheckCircle2, AlertTriangle, RotateCcw, ArrowRight } from "lucide-react"
+import { Loader2, CheckCircle2, AlertTriangle, RotateCcw, ArrowRight, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { resolveApiUrl, getApiUrlSync } from "@/lib/api/client"
 
 interface SplashScreenProps {
   onComplete: () => void
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api"
 const MIN_SPLASH_MS = 1400
 const MAX_ATTEMPTS = 45 // ~27 segundos max
 const POLL_INTERVAL_MS = 600
@@ -26,14 +26,15 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [status, setStatus] = useState<"connecting" | "ready" | "error">("connecting")
   const [attempts, setAttempts] = useState(0)
   const [statusMessageIndex, setStatusMessageIndex] = useState(0)
+  const [activeApiUrl, setActiveApiUrl] = useState<string>(getApiUrlSync())
   const startTimeRef = useRef(Date.now())
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const checkApiHealth = async (): Promise<boolean> => {
+  const checkApiHealth = async (url: string): Promise<boolean> => {
     try {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 1500)
-      const res = await fetch(API_BASE, {
+      const res = await fetch(url, {
         method: "GET",
         signal: controller.signal,
       })
@@ -61,11 +62,14 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
     let currentAttempt = 0
 
     const poll = async () => {
+      const resolvedUrl = await resolveApiUrl()
+      setActiveApiUrl(resolvedUrl)
+
       currentAttempt++
       setAttempts(currentAttempt)
       setStatusMessageIndex((prev) => (prev + 1) % STATUS_MESSAGES.length)
 
-      const isReady = await checkApiHealth()
+      const isReady = await checkApiHealth(resolvedUrl)
       if (isReady) {
         finishSplash()
         return
@@ -139,7 +143,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               {/* Barra de progreso indeterminada con animación pulsante */}
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.08]">
                 <div
-                  className="h-full w-2/5 rounded-full bg-gradient-to-r from-[#5EB3FF] to-[#35D6E8] animate-[shimmer_1.5s_infinite]"
+                  className="h-full w-2/5 rounded-full bg-gradient-to-r from-[#5EB3FF] to-[#35D6E8]"
                   style={{
                     animation: "pulse 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
                     width: `${Math.min(100, Math.max(15, (attempts / MAX_ATTEMPTS) * 100))}%`,
@@ -166,14 +170,24 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               <div className="flex items-start gap-2.5 text-amber-300">
                 <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
                 <div className="text-xs">
-                  <p className="font-semibold text-foreground">El motor está tardando en responder</p>
+                  <p className="font-semibold text-foreground">El motor local está tardando en responder</p>
                   <p className="mt-1 text-muted-foreground text-[11px]">
-                    No se recibió respuesta en {API_BASE} tras varios intentos.
+                    No se recibió respuesta en {activeApiUrl} tras varios intentos.
                   </p>
                 </div>
               </div>
 
-              <div className="mt-2 flex w-full items-center gap-2">
+              <div className="w-full rounded-md border border-white/[0.08] bg-black/40 p-2.5 text-[11px] text-[#8FB0DD]/80">
+                <div className="flex items-center gap-1.5 font-medium text-[#5EB3FF] mb-1">
+                  <FileText className="h-3.5 w-3.5" />
+                  <span>Diagnóstico y registro del sidecar:</span>
+                </div>
+                <code className="block break-all font-mono text-[10px] text-white/90 select-all bg-white/[0.04] p-1 rounded">
+                  %APPDATA%\Corelyze\logs\backend.log
+                </code>
+              </div>
+
+              <div className="mt-1 flex w-full items-center gap-2">
                 <Button
                   size="sm"
                   variant="outline"

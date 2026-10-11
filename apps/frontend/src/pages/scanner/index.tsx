@@ -409,7 +409,7 @@ export default function ScannerPage() {
           {!result && !error && (
             <p className="text-xs text-muted-foreground">
               Se consultará el agente Tauri si está disponible; de lo contrario se usará
-              http://localhost:3000/api/hardware/scan.
+              la API local de Corelyze (/api/hardware/scan).
             </p>
           )}
         </CardContent>

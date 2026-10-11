@@ -564,15 +564,14 @@ export default function SimulatorPage() {
       {loading && (
         <div className="flex items-center gap-2 rounded-lg border bg-muted/20 p-4 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Cargando catálogo desde http://localhost:3000/api/components…
+          Cargando catálogo desde el motor local de Corelyze…
         </div>
       )}
 
       {loadError && (
         <div className="flex flex-col items-start gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
           <p className="text-sm text-destructive">
-            No se pudo conectar con la API ({loadError}). Verifica que el backend esté en
-            http://localhost:3000/api.
+            No se pudo conectar con el motor local ({loadError}). Verifica los registros en %APPDATA%\Corelyze\logs\backend.log.
           </p>
           <Button size="sm" variant="outline" onClick={retry}>
             <RotateCcw className="h-4 w-4" />

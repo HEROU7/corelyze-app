@@ -127,8 +127,8 @@ analizador-hardware/
    npm run dev
    ```
    - **Frontend:** `http://localhost:5173`
-   - **API Backend:** `http://localhost:3000/api`
-   - **Documentación Swagger:** `http://localhost:3000/api/docs`
+   - **API Backend:** `http://localhost:49152/api` (o puerto libre dinámico)
+   - **Documentación Swagger:** `http://localhost:49152/api/docs`
 
 ---
 

@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api"
+import { getApiUrlSync } from "@/lib/api/client"
 
 export interface TelemetryGpu {
   name: string
@@ -36,7 +36,7 @@ export interface TelemetrySnapshot {
 export function telemetryUrl(intervalMs: number, gatewayId?: string | null): string {
   const base = gatewayId
     ? `http://${gatewayId}/api/telemetry/stream?interval=${Math.round(intervalMs)}`
-    : `${API_URL}/telemetry/stream?interval=${Math.round(intervalMs)}`
+    : `${getApiUrlSync()}/telemetry/stream?interval=${Math.round(intervalMs)}`
   return base
 }
 
