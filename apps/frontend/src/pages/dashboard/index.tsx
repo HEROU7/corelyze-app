@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CorelyzeMark } from "@/components/brand/corelyze-logo"
 import { cn } from "@/lib/utils"
 import {
   Cpu,
@@ -123,22 +122,15 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-6 p-6">
       <div className="glass-panel glass-panel-accent top-hairline lift rounded-2xl p-6">
         <div className="flex flex-wrap items-center gap-5">
-          <CorelyzeMark
-            size={52}
-            className="drop-shadow-[0_0_18px_color-mix(in_srgb,var(--section-accent)_55%,transparent)]"
-          />
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1
-                className="bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl"
-                style={{
-                  backgroundImage: "linear-gradient(90deg, var(--section-accent), var(--section-accent-2))",
-                }}
-              >
-                Corelyze
-              </h1>
-              <Badge variant="section">v1.0</Badge>
-            </div>
+            <h1
+              className="bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl"
+              style={{
+                backgroundImage: "linear-gradient(90deg, var(--section-accent), var(--section-accent-2))",
+              }}
+            >
+              Corelyze
+            </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
               Diagnóstico, simulación, compatibilidad y recomendación de hardware de PC.
             </p>

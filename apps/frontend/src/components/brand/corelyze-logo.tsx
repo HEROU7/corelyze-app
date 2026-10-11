@@ -15,7 +15,7 @@ export function CorelyzeMark({ className, size = 36 }: CorelyzeLogoProps) {
       alt="Corelyze"
       width={size}
       height={size}
-      className={cn("shrink-0 object-contain", className)}
+      className={cn("shrink-0 object-contain drop-shadow-[0_0_10px_rgba(53,214,232,0.45)]", className)}
       draggable={false}
     />
   )
